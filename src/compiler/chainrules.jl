@@ -303,7 +303,10 @@ end
 
 # Dict handling in Zygote is a mess... should this become a  `Tangent{Dict,Dict}` ?
 # Right now it uses a NamedTuple but not for fields of the AbstractDict struct
-z2d(dx::NamedTuple, primal::AbstractDict) = dx
+function z2d(dx::NamedTuple, primal::AbstractDict)
+    primal isa Base.Iterators.Pairs && return invoke(z2d, Tuple{NamedTuple, Any}, dx, primal) # translate primal = kwargs properly
+    dx
+end
 
 function z2d(delta::NamedTuple, primal::T) where T  # arbitrart struct
   fnames = fieldnames(T)
